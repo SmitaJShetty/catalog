@@ -1,7 +1,7 @@
 package main
 
 import (
-	"AP/router"
+	"ArticleApp/router"
 	"fmt"
 )
 

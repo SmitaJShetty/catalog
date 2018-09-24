@@ -4,16 +4,15 @@ package models
 type TagSummary struct {
 	Tag         string   `json:"tag"`
 	Count       uint     `json:"count"`
-	ArticleIDs  []int    `json:"articles"`
+	ArticleIDs  []string `json:"articles"`
 	RelatedTags []string `json:"related_tags"`
 }
 
 //NewTagSummary returns new tag summary
-func NewTagSummary(tagName string, articleIDs []int, relatedTags []string) *TagSummary {
+func NewTagSummary(tagName string, articleIDs []string) *TagSummary {
 	return &TagSummary{
-		Count:       1,
-		ArticleIDs:  articleIDs,
-		RelatedTags: relatedTags,
-		Tag:         tagName,
+		Count:      1,
+		ArticleIDs: articleIDs,
+		Tag:        tagName,
 	}
 }

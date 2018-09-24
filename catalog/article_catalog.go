@@ -3,47 +3,56 @@ package catalog
 import (
 	"ArticleApp/models"
 	"fmt"
+	"strings"
 	"time"
-
-	"github.com/pborman/uuid"
 )
 
 //Repository exposes methods for articles
 type Repository interface {
-	GetByID(id uuid.UUID) (*models.Article, error)
+	GetByID(id string) (*models.Article, error)
 	GetAll() ([]*models.Article, error)
 	CreateArticle(article *models.ArticleRequest) error
-	GetByDateAndName(date time.Time, name string) ([]*models.Tag, error)
+	GetTagSummaryByDateAndName(date time.Time, name string) (*models.TagSummary, error)
 }
 
 //ArticleCatalog construct for manipulating articles and tags
 type ArticleCatalog struct {
-	repo Repository
+	repository Repository
 }
 
 //GetByID gets articles by id passed as argument
-func (ac *ArticleCatalog) GetByID(id uuid.UUID) (*models.Article, error) {
-	if id == nil {
-		return nil, fmt.Errorf("Invalid guid")
-	}
-	return repo.GetByID(id)
+func (ac *ArticleCatalog) GetByID(id string) (*models.Article, error) {
+	return ac.repository.GetByID(id)
 }
 
 //GetAll gets all articles
 func (ac *ArticleCatalog) GetAll() ([]*models.Article, error) {
-	return repo.GetAll()
+	return ac.repository.GetAll()
 }
 
 //CreateArticle creates an article
-func (ac *ArticleCatalog) CreateArticle(article *models.ArticleRequest) error {
-	if article == nil {
+func (ac *ArticleCatalog) CreateArticle(articleReq *models.ArticleRequest) error {
+	if articleReq == nil {
 		return fmt.Errorf("Article is empty")
 	}
 
-	return repo.CreateArticle(article)
+	validateErr := articleReq.Validate()
+	if validateErr != nil {
+		return validateErr
+	}
+
+	return ac.repository.CreateArticle(articleReq)
 }
 
-//GetByDateAndName  gets a in memory tag repo stored tag, by name and date
-func (ac *ArticleCatalog) GetByDateAndName(date time.Time, name string) ([]*models.Tag, error) {
+//GetTagSummaryByDateAndName  gets a in memory tag ac.repository stored tag, by name and date
+func (ac *ArticleCatalog) GetTagSummaryByDateAndName(date time.Time, tagName string) (*models.TagSummary, error) {
+	if strings.Trim(tagName, " ") == "" {
+		return nil, fmt.Errorf("tag name is empty")
+	}
 
+	if date.IsZero() {
+		return nil, fmt.Errorf("Empty date")
+	}
+
+	return ac.repository.GetTagSummaryByDateAndName(date, tagName)
 }

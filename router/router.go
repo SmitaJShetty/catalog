@@ -23,6 +23,15 @@ func Start(listenAddress string) {
 			fmt.Println(err)
 		}
 
+		rtr.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+			t, err := route.GetPathTemplate()
+			if err != nil {
+				return err
+			}
+			fmt.Println(t)
+			return nil
+		})
+
 		fmt.Println("Listening on port:", listenAddress)
 	}()
 }

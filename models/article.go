@@ -1,16 +1,12 @@
 package models
 
-import (
-	"time"
-)
-
 //Article - construct for a basic article
 type Article struct {
-	ID    int       `json:"id"`
-	Title string    `json:"title"`
-	Date  time.Time `json:"date"`
-	Tags  []string  `json:"tags"`
-	Body  string    `json:"body"`
+	ID    string   `json:"id"`
+	Title string   `json:"title"`
+	Date  string   `json:"date"`
+	Tags  []string `json:"tags"`
+	Body  string   `json:"body"`
 }
 
 //NewArticle returns a new article with a generated id

@@ -6,31 +6,31 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pborman/uuid"
 )
 
 //InMemoryArticleRepo article repo implemented in in-memory
 type InMemoryArticleRepo struct {
-	ArticleMap map[int]models.Article
+	//dataStore ArticleMap
 }
 
 //GetByID gets articles by id passed as argument
-func (r *InMemoryArticleRepo) GetByID(id uuid.UUID) (*models.Article, error) {
-	value := r.ArticleMap[id]
-	return &value, nil
+func (r *InMemoryArticleRepo) GetByID(id string) (*models.Article, error) {
+	store := GetArticleMapInstance()
+
+	value := store.ArticleMap[id]
+	return value, nil
 }
 
 //GetAll gets all articles
 func (r *InMemoryArticleRepo) GetAll() ([]*models.Article, error) {
-	return getAllInMap(), nil
+	return r.getAllInMap()
 }
 
-func (r *InMemoryArticleRepo) getAllInMap() ([]models.Article, error) {
-	var articles []models.Article
-	count := len(r.ArticleMap)
+func (r *InMemoryArticleRepo) getAllInMap() ([]*models.Article, error) {
+	var articles []*models.Article
+	store := GetArticleMapInstance()
 
-	for _, value := range r.ArticleMap {
+	for _, value := range store.ArticleMap {
 		articles = append(articles, value)
 	}
 
@@ -50,26 +50,35 @@ func (r *InMemoryArticleRepo) CreateArticle(articleReq *models.ArticleRequest) e
 
 	newArticle := models.NewArticle(articleReq)
 
-	//save article in repo
-	r.ArticleMap[newArticle.ID] = newArticle
+	store := GetArticleMapInstance()
 
-	//update tag summary
-	r.updateTagSummaryCache(newArticle)
+	(store.ArticleMap)[newArticle.ID] = newArticle
+
+	fmt.Println("article map items:", store.ArticleMap)
+
+	tagSummaryInstance := GetTagSummaryInstance()
+	tagSummaryInstance.updateTagSummaries(newArticle)
 	return nil
 }
 
 //GetTagSummaryByDateAndName  gets a in memory tag repo stored tag, by name and date
-func (r *InMemoryArticleRepo) GetTagSummaryByDateAndName(articleDate time.Time, tagName string) ([]*models.Tag, error) {
-	if strings.Trim(tagName) == "" {
-		return nil, fmt.Errorf()
+func (r *InMemoryArticleRepo) GetTagSummaryByDateAndName(articleDate time.Time, tagName string) (*models.TagSummary, error) {
+	if strings.Trim(tagName, " ") == "" {
+		return nil, fmt.Errorf("Empty tagName")
 	}
 
-	var mu sync.Mutex
+	var mu sync.RWMutex
 
 	date := articleDate.Format("2006-01-02")
 	tagSummaryMapInstance := GetTagSummaryInstance()
+	fmt.Println("tagSummaryMapInstance", tagSummaryMapInstance.summary[date])
 
 	mu.RLock()
 	defer mu.RUnlock()
-	return tagSummaryMapInstance.summary[date][tagName], nil
+	summaryByDate := tagSummaryMapInstance.summary[date]
+	if summaryByDate == nil {
+		return nil, nil
+	}
+
+	return (*summaryByDate)[tagName], nil
 }
