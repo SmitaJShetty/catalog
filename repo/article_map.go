@@ -24,3 +24,7 @@ func GetArticleMapInstance() *ArticleMap {
 
 	return articleMapInstance
 }
+
+func ResetArticleMap() {
+	articleMapInstance = nil
+}

@@ -13,6 +13,7 @@ type Repository interface {
 	GetAll() ([]*models.Article, error)
 	CreateArticle(article *models.ArticleRequest) error
 	GetTagSummaryByDateAndName(date time.Time, name string) (*models.TagSummary, error)
+	Reset()
 }
 
 //ArticleCatalog construct for manipulating articles and tags
@@ -46,7 +47,7 @@ func (ac *ArticleCatalog) CreateArticle(articleReq *models.ArticleRequest) error
 
 //GetTagSummaryByDateAndName  gets a in memory tag ac.repository stored tag, by name and date
 func (ac *ArticleCatalog) GetTagSummaryByDateAndName(date time.Time, tagName string) (*models.TagSummary, error) {
-	if strings.Trim(tagName, " ") == "" {
+	if strings.TrimSpace(tagName) == "" {
 		return nil, fmt.Errorf("tag name is empty")
 	}
 

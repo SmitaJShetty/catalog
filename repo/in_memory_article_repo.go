@@ -13,6 +13,11 @@ type InMemoryArticleRepo struct {
 	//dataStore ArticleMap
 }
 
+// Reset resets article map
+func (r *InMemoryArticleRepo) Reset() {
+	ResetArticleMap()
+}
+
 //GetByID gets articles by id passed as argument
 func (r *InMemoryArticleRepo) GetByID(id string) (*models.Article, error) {
 	store := GetArticleMapInstance()
@@ -48,16 +53,17 @@ func (r *InMemoryArticleRepo) CreateArticle(articleReq *models.ArticleRequest) e
 		return validateErr
 	}
 
+	var mu sync.Mutex
+
+	mu.Lock()
 	newArticle := models.NewArticle(articleReq)
-
 	store := GetArticleMapInstance()
-
 	(store.ArticleMap)[newArticle.ID] = newArticle
-
-	fmt.Println("article map items:", store.ArticleMap)
-
 	tagSummaryInstance := GetTagSummaryInstance()
+
 	tagSummaryInstance.updateTagSummaries(newArticle)
+	mu.Unlock()
+
 	return nil
 }
 
@@ -71,7 +77,6 @@ func (r *InMemoryArticleRepo) GetTagSummaryByDateAndName(articleDate time.Time, 
 
 	date := articleDate.Format("2006-01-02")
 	tagSummaryMapInstance := GetTagSummaryInstance()
-	fmt.Println("tagSummaryMapInstance", tagSummaryMapInstance.summary[date])
 
 	mu.RLock()
 	defer mu.RUnlock()

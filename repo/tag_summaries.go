@@ -47,17 +47,18 @@ func (r *TagSummaries) updateTagSummaries(article *models.Article) error {
 		}
 
 		summaryInstance.summary[articleDate] = &m
+		dateMapValue = summaryInstance.summary[articleDate]
 	}
-
-	dateMapValue = summaryInstance.summary[articleDate]
 
 	for _, tag := range article.Tags {
 		tagSummary := (*dateMapValue)[tag]
+
 		if tagSummary == nil {
 			tagSummary = models.NewTagSummary(tag, []string{article.ID})
 		}
 
 		r.populateTagSummary(tagSummary, article)
+		(*dateMapValue)[tag] = tagSummary
 	}
 
 	return nil
@@ -65,10 +66,6 @@ func (r *TagSummaries) updateTagSummaries(article *models.Article) error {
 
 func (r *TagSummaries) populateTagSummary(tagSummary *models.TagSummary, article *models.Article) *models.TagSummary {
 	differentArticle := false
-
-	fmt.Println("article.ID", article.ID)
-	fmt.Println("tagSummary", tagSummary)
-	fmt.Println("ArticleIDs", tagSummary.ArticleIDs)
 
 	if !common.IfExists(article.ID, tagSummary.ArticleIDs) {
 		tagSummary.ArticleIDs = append(tagSummary.ArticleIDs, article.ID)

@@ -9,6 +9,10 @@ import (
 type RedisArticleRepo struct {
 }
 
+// Reset resets article map
+func (r *RedisArticleRepo) Reset() {
+}
+
 //GetByID gets articles by id passed as argument
 func (r *RedisArticleRepo) GetByID(id string) (*models.Article, error) {
 	return nil, nil

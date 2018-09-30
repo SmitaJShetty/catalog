@@ -30,7 +30,6 @@ func Test_GetAll_Success(t *testing.T) {
 
 func Test_GetByID_Success(t *testing.T) {
 	catalog := CreateCatalog()
-
 	articleReq := models.ArticleRequest{
 		ID:    "1",
 		Title: "The Shire",
@@ -44,7 +43,7 @@ func Test_GetByID_Success(t *testing.T) {
 	articleReq = models.ArticleRequest{
 		ID:    "2",
 		Title: "One ring to rule them all",
-		Tags:  []string{"Ranger", "Gandalf, the gray"},
+		Tags:  []string{"Ranger", "Gandalf the gray"},
 		Date:  "2008-09-11",
 		Body:  "When Mr. Bilbo Baggins of Bag End announced that he would shortly be celebrating his eleventy-first birthday...",
 	}
@@ -74,7 +73,6 @@ func Test_CreateArticle_Success(t *testing.T) {
 
 func Test_GetTagByDateAndName_Success(t *testing.T) {
 	catalog := CreateCatalog()
-
 	articleReq := models.ArticleRequest{
 		ID:    "1",
 		Title: "The Shire",
@@ -88,10 +86,11 @@ func Test_GetTagByDateAndName_Success(t *testing.T) {
 	articleReq = models.ArticleRequest{
 		ID:    "2",
 		Title: "One ring to rule them all",
-		Tags:  []string{"Ranger", "Gandalf, the gray", "Bilbo Baggins"},
+		Tags:  []string{"Ranger", "Gandalf the gray", "Bilbo Baggins"},
 		Date:  "2008-09-11",
 		Body:  "When Mr. Bilbo Baggins of Bag End announced that he would shortly be celebrating his eleventy-first birthday...",
 	}
+
 	createErr = catalog.CreateArticle(&articleReq)
 	assert.Nil(t, createErr)
 
@@ -99,9 +98,10 @@ func Test_GetTagByDateAndName_Success(t *testing.T) {
 	assert.Nil(t, tagDateErr)
 
 	actual, err := catalog.GetTagSummaryByDateAndName(date, "Bilbo Baggins")
-	assert.Nil(t, err)
 	assert.NotNil(t, actual)
+	assert.Nil(t, err)
+
 	assert.Equal(t, actual.Tag, "Bilbo Baggins")
 	assert.Equal(t, []string{"1", "2"}, actual.ArticleIDs)
-	assert.Equal(t, []string{"Samwise Gamgee", "Ranger", "Gandalf, the gray"}, actual.RelatedTags)
+	assert.Equal(t, []string{"Samwise Gamgee", "Ranger", "Gandalf the gray"}, actual.RelatedTags)
 }
