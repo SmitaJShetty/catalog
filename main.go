@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	listenAddress := "localhost:8090"
+	listenAddress := "0.0.0.0:8090"
 	router.Start(listenAddress)
 	fmt.Printf("Server listening on: %s ...", listenAddress)
 
